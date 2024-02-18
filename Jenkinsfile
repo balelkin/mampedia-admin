@@ -1,34 +1,44 @@
-
 pipeline {
-    agent {
-        docker {
-            image 'node:20.10.0-bullseye-slim'
-            args '-p 3000:3000'
-        }
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+  }
+  environment {
+    HEROKU_API_KEY = credentials('heroku-api-key')
+    IMAGE_NAME = 'balelkin/mampedia-admin'
+    IMAGE_TAG = 'latest'
+    APP_NAME = 'mampedia-admin'
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+      }
     }
-    environment {
-        CI = 'true'
+    stage('Login') {
+      steps {
+        sh 'echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
-            steps {
-//                 sh './jenkins/scripts/test.sh'
-                   echo "Testing the app"
-
-            }
-        }
-        stage('Deliver') {
-            steps {
-//                 sh './jenkins/scripts/deliver.sh'
-//                 input message: 'Finished using the web site? (Click "Proceed" to continue)'
-//                 sh './jenkins/scripts/kill.sh'
-                   echo "Delivering the app"
-            }
-        }
+    stage('Push to Heroku registry') {
+      steps {
+        sh '''
+          docker tag $IMAGE_NAME:$IMAGE_TAG registry.heroku.com/$APP_NAME/web
+          docker push registry.heroku.com/$APP_NAME/web
+        '''
+      }
     }
+    stage('Release the image') {
+      steps {
+        sh '''
+          heroku container:release web --app=$APP_NAME
+        '''
+      }
+    }
+  }
+  post {
+    always {
+      sh 'docker logout'
+    }
+  }
 }
