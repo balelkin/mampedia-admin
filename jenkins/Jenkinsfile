@@ -2,7 +2,7 @@
 pipeline {
     agent {
         docker {
-            image 'node:20.10.0-bullseye-slim'
+            image 'node:latest'
             args '-p 3000:3000'
         }
     }
