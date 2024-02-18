@@ -5,7 +5,7 @@ pipeline {
   }
   environment {
     HEROKU_API_KEY = credentials('heroku-api-key')
-    IMAGE_NAME = 'balelkin/mampedia-admin'
+    IMAGE_NAME = 'mampedia-admin'
     IMAGE_TAG = 'latest'
     APP_NAME = 'mampedia-admin'
   }
