@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        HEROKU_APP_NAME = 'your-heroku-app-name'
-        HEROKU_API_KEY = credentials('your-heroku-api-key')
+        HEROKU_APP_NAME = 'mampedia-admin-test-jenkins'
+        HEROKU_API_KEY = credentials('701b2af7-dced-4765-9962-68bc5d5a6b12')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'your-gitlab-repo-url'
+                git 'https://github.com/balelkin/mampedia-admin.git'
             }
         }
         stage('Build') {
