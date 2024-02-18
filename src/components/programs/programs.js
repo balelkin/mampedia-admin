@@ -12,8 +12,8 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 // import 'codemirror/lib/codemirror.css';
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBkMjg3OWVmLWRiNTEtNGY4NC05OGQ5LWM0M2U3MTdjYzhkYiIsImVtYWlsIjoiYmFsZWxraW5uQGdtYWlsLmNvbSIsIm1lbWJlcnNoaXBUeXBlIjoiUEFJRCIsInJvbGVzIjpbIlVTRVIiLCJBRE1JTiJdLCJzZXNzaW9uSWQiOiJlMzQ4N2ZjNi0yNWY5LTRmMzUtOWRmYi05NTE5NjFiYjY4YmMiLCJpYXQiOjE3MDc5MDQ5OTYsImV4cCI6MTc5NDMwNDk5Nn0.BomrWW5qmucCLhY0-4J_l6Hg5ZFifIlgGNf9gvHU6do';
-const baseUrl = 'https://onix-systems-mampedia-backend.staging.onix.ua/api/v1';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBkMjg3OWVmLWRiNTEtNGY4NC05OGQ5LWM0M2U3MTdjYzhkYiIsImVtYWlsIjoiYmFsZWxraW5uQGdtYWlsLmNvbSIsIm1lbWJlcnNoaXBUeXBlIjoiUEFJRCIsInJvbGVzIjpbIlVTRVIiXSwic2Vzc2lvbklkIjoiZDY0ODNjYzgtNGJjMy00NGE3LWE4ZTctNzBlMzRmZTI1NzZkIiwiaWF0IjoxNzA4MDgxNjA5LCJleHAiOjE3OTQ0ODE2MDl9.FYokARckHcHIMZPrW6udLyoYdY_yoZMaU1C27XiXEqQ';
+const baseUrl = 'https://api.mampediaapp.com/api/v1';
 function ProgramList() {
     const [programs, setPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -107,7 +107,6 @@ function Category({ category }) {
                         Method: 'GET',
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
-                        Origin: 'http://localhost:3001'
                     }
                 });
                 setArticles(response.data.data);
@@ -170,19 +169,26 @@ function ImgMediaCard({ article }) {
             title,
             picture: imageUrl,
         }
-        axios.patch(`https://onix-systems-mampedia-backend.staging.onix.ua/api/v1/articles/${article.id}`, body, {
+        console.log('body:', body);
+        axios.patch(`${baseUrl}/articles/${article.id}`, body, {
+        // axios.patch(`https://onix-systems-mampedia-backend.staging.onix.ua/api/v1/articles/807e4523-ff6e-4019-9b75-65d69efc7b88`, {}, {
             headers: {
                 Method: 'PATCH',
                 Authorization: `Bearer ${token}`,
-                Origin: 'http://localhost:3001'
-            }
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin' : '*',
+                'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+               'Content-Security-Policy': 'default-src *; script-src *; connect-src *; img-src *; style-src *; frame-src *; font-src *; media-src *;',
+            },
+            mode: 'no-cors',
+            // withCredentials: true,
         }).then(response => {
             console.log('Article updated:', response.data);
         }).catch(error => {
             console.error('Error updating article:', error);
         });
         handleClose();
-        window.location.reload();
+        // window.location.reload();
     };
 
     return (
@@ -192,7 +198,7 @@ function ImgMediaCard({ article }) {
                     component="img"
                     alt="green iguana"
                     height="140"
-                    image={article.picture}
+                    image={article.picture ? article.picture.peplace('original', 'small') : ''}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
